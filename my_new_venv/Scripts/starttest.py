@@ -10,26 +10,36 @@ class SimpleNN:
 
     def forward(self, x):
         # Forward pass: Input -> Hidden (ReLU Activation) -> Output
-        return x.dot(self.l1).relu().dot(self.l2)
+        x = x.dot(self.l1).relu()
+        x = x.dot(self.l2).relu()
+        return x.dot(self.l3)
 
 # Create a simple model
 model = SimpleNN()
 
 # Define an optimizer
-optimizer = optim.SGD([model.l1, model.l2], lr=0.001)
+optimizer = optim.Adam([model.l1, model.l2, model.l3], lr=0.001)
 
 # Mock some data
 input_data = Tensor([[1, 2, 3, 4, 5]])
 true_output = Tensor([[1]])
 
-# Forward pass
-predicted_output = model.forward(input_data)
+# Training loop
+for epoch in range(10):
+    # Forward pass
+    predicted_output = model.forward(input_data)
 
-# Calculate loss (Mean Squared Error)
-loss = ((predicted_output - true_output) ** 2).mean()
+    # Calculate loss (Mean Squared Error)
+    loss = ((predicted_output - true_output) ** 2).mean()
 
-# Backpropagation
-loss.backward()
+    # Backpropagation
+    loss.backward()
 
-# Update weights
-optimizer.step()
+    # Update weights
+    optimizer.step()
+
+    # Zero gradients
+    optimizer.zero_grad()
+
+print(f'Epoch: {epoch}, Loss: {loss.numpy()}')
+
